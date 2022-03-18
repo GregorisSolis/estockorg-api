@@ -82,4 +82,61 @@ router.get('/data-user/:userName', async (req,res) =>{
     }
 })
 
+//UPDATE USER
+router.put('/update-user/:userID', async (req,res) => {
+
+    const { userName } = req.body
+
+    try{
+
+        if (await User.findOne({ userName })) {
+            return res.status(400).send({ erro: 'user already exists.' })
+        }
+
+        const user = await User.findByIdAndUpdate(req.params.userID,{...req.body},{new: true})
+        return res.send({ user })
+
+    }
+    catch(err){
+        return res.status(400).send({ erro: 'erro in update-user.'})
+    }
+})
+
+//RESET PASSWORD USER
+router.put('/reset-password/:userID', async (req,res) => {
+
+    const { password } = req.body
+
+    try{
+
+            const user = await User.findById(req.params.userID).select('+password')
+
+            if(!user){
+                res.status(400).send({ erro: 'user not found.' })
+            }
+
+            user.password = password
+
+            await user.save()
+
+            res.send({ user })
+
+    }
+    catch(err){
+        return res.status(400).send({ erro: 'error in reset-password'})
+    }
+})
+
+//DELETE USER
+router.delete('/delete-user/:userID', async (req, res) =>{
+    try{
+
+        await User.findByIdAndRemove(req.params.userID)
+        return res.send({ message: "User deleted."})
+
+    }catch(err){
+        return res.status(400).send({ erro: 'erro in delete-user' })
+    }
+})
+
 module.exports = app => app.use('/user', router)

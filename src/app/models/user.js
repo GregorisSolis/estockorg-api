@@ -6,6 +6,8 @@ const UserSchema = new mongoose.Schema({
 	userName:{type: String, required: true, unique: true, lowercase: true},
 	password:{type: String, required: true, select: false},
 	permitType:{type: String, required: true},
+	isActive:{type: Boolean, default: false},
+	company:{type: String, required: true},
 	createdAt: {type: Date, default: Date.now}
 })
 

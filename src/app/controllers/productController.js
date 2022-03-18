@@ -1,14 +1,14 @@
 const express = require('express')
-const Product = require('../models/product')
 const authMiddleware = require('../middlewares/auth')
+const Product = require('../models/product')
 
 const router = express.Router()
 router.use(authMiddleware)
 
-//SHOW ALL PRODUCT
-router.get('/list-product', async (req,res)=>{
+//GET ALL PRODUCT BY COMPANY
+router.get('/list-product/:nameCompany', async (req,res)=>{
 	try{
-		const products = await Product.find()
+		const products = await Product.findOne({ nameCompany: req.params.nameCompany })
 		return res.send({ products })
 	}
 	catch(err){
@@ -16,25 +16,35 @@ router.get('/list-product', async (req,res)=>{
 	}
 })
 
-//SHOW LIST OF PRODUCT BY
+//GET LIST OF PRODUCT BY
 router.get('/product-by/:code', async (req, res) =>{
 	try{
 		const product = await Product.find({ companyCode: req.params.code })
 		return res.send({product})
 	}
 	catch(err){
-		return res.status(400).send({ error: "Erro in show product by. " + err })
+		return res.status(400).send({ error: "Erro in show product by. "})
 	}
 })
 
 //ADD PRODUCT
 router.post('/add-product', async (req,res) =>{
+
+	const { barcode, companyCode, nameCompany } = req.body
+
 	try{
-		const product = await Product.create(req.body)
+
+		if(await Product.findOne({ barcode }) || await Product.findOne({ companyCode })){
+			if(await Product.findOne({ nameCompany })){
+				return res.status(400).send({ error: "Product Duplicate."})
+			}
+		}
+
+		const product = await Product.create({ ...req.body, addedBy: req.userId, editedBy: req.userId})
 		return res.send({ product })
 	}
 	catch(err){
-		return res.status(400).send({ error: "Erro in adding the product. "})
+		return res.status(400).send({ error: "Erro in adding the product. "+ err})
 	}
 })
 
@@ -42,7 +52,7 @@ router.post('/add-product', async (req,res) =>{
 
 router.put('/edit-product/:productID', async(req,res)=>{
 	try{
-		const product = await Product.findByIdAndUpdate(req.params.productID,{...req.body, user: req.userID},{new: true})
+		const product = await Product.findByIdAndUpdate(req.params.productID,{...req.body, editedBy: req.userId},{new: true})
 		return res.send({ product })
 	}
 	catch(err){
