@@ -8,7 +8,7 @@ router.use(authMiddleware)
 //GET ALL PRODUCT BY COMPANY
 router.get('/list-product/:nameCompany', async (req,res)=>{
 	try{
-		const products = await Product.findOne({ nameCompany: req.params.nameCompany })
+		const products = await Product.find({ nameCompany: req.params.nameCompany })
 		return res.send({ products })
 	}
 	catch(err){
@@ -16,13 +16,26 @@ router.get('/list-product/:nameCompany', async (req,res)=>{
 	}
 })
 
-//GET LIST OF PRODUCT BY
-router.get('/product-by/:code', async (req, res) =>{
+//GET LIST OF PRODUCT BY ID
+router.get('/product-data/:ID', async (req, res) =>{
 	try{
-		const product = await Product.find({ companyCode: req.params.code })
+		const product = await Product.findById(req.params.ID)
 		return res.send({product})
 	}
 	catch(err){
+		return res.status(400).send({ error: "Erro in show product by. "})
+	}
+})
+
+//GET LIST OF PRODUCT BY BARCODE
+router.get('/product-info/:code', async (req, res) =>{
+
+	try{
+		const product = await Product.find({ barcode: req.params.code })
+		return res.send({product})
+	}
+	catch(err){
+		console.log(err)
 		return res.status(400).send({ error: "Erro in show product by. "})
 	}
 })

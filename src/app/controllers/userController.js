@@ -21,12 +21,12 @@ const router = express.Router()
 //CREATE USER
 router.post('/new-user', async (req, res) => {
 
-    const { userName } = req.body
+    const { username } = req.body
 
     try {
 
-        if (await User.findOne({ userName })) {
-            return res.status(400).send({ erro: 'user already exists.' })
+        if (await User.findOne({ username })) {
+            return res.status(400).send({ erro: 'user already exists...' })
         }
 
         const user = await User.create(req.body)
@@ -40,16 +40,16 @@ router.post('/new-user', async (req, res) => {
 
     }
     catch (err) {
-        return res.status(400).send({ error: 'registration Failed. '})
+        return res.status(400).send({ error: 'registration Failed. ' + err})
     }
 })
 
 //AUTHENTICAR USER
 router.post('/authenticar-user', async (req, res)  =>{
 
-    const { userName, password } = req.body
+    const { username, password } = req.body
 
-    const user = await User.findOne({ userName }).select('+password')
+    const user = await User.findOne({ username }).select('+password')
 
     if(!user){
         return res.status(400).send({ error: 'User not found' })
@@ -74,7 +74,7 @@ router.use(authMiddleware)
 router.get('/data-user/:userName', async (req,res) =>{
 
     try{
-        const user = await User.findOne({ userName: req.params.userName })
+        const user = await User.findOne({ username: req.params.userName })
         return res.send({ user })
     }
     catch(err){
@@ -85,11 +85,11 @@ router.get('/data-user/:userName', async (req,res) =>{
 //UPDATE USER
 router.put('/update-user/:userID', async (req,res) => {
 
-    const { userName } = req.body
+    const { username } = req.body
 
     try{
 
-        if (await User.findOne({ userName })) {
+        if (await User.findOne({ username })) {
             return res.status(400).send({ erro: 'user already exists.' })
         }
 
