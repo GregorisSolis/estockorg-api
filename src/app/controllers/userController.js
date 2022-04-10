@@ -21,7 +21,15 @@ const router = express.Router()
 //CREATE USER
 router.post('/new-user', async (req, res) => {
 
-    const { username } = req.body
+    let { username, isActive, permitType } = req.body
+
+    if(permitType === "1"){
+        isActive = true
+        permitType = 'boss'
+    }else if(permitType === "2"){
+        isActive = false
+        permitType = 'auxi'
+    }
 
     try {
 
